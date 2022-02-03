@@ -218,8 +218,15 @@ bot.on('message', (msg) => {
                                     });
                 }
             else{
+
                 summ1 = parseInt(summ);
-                if(summ1 > balance){
+
+    const objTg_id = Object.assign({"tg_id": chatId});
+
+
+    	User.findOne({where: objTg_id}).then(id => {
+
+                if(summ1 > id.balance){
                     txt1 = 'Не достаточно средств';
                     bot.sendMessage(chatId, txt1, { // прикрутим клаву
                                         reply_markup: {
@@ -227,7 +234,7 @@ bot.on('message', (msg) => {
                                         }
                                     });
                 }
-                else if(1200 > balance){
+                else if(1200 > summ1){
                     txt1 = 'Минимальная сумма вывода 1200грн';
                     bot.sendMessage(chatId, txt1, { // прикрутим клаву
                                         reply_markup: {
@@ -243,11 +250,11 @@ bot.on('message', (msg) => {
                             inline_keyboard: card1
                         }
                     });
-                
-            }
+	}                
+
+            });
             
-}
-        
+	}        
     }
     if(status === 2){
                  card = msg.text;
@@ -305,18 +312,21 @@ bot.onText(/\/start/, (msg) => {
                 "balance": balance,
             });
         }
-    });
+	let txt = '👋Здравствуй, ' + first_name + '\nВаш id: ' + chatId + '\nВаш баланс: ' + id.balance +' грн \n\nТех.поддержка: @firstobmen_support';
 
-
-let txt = '👋Здравствуй, ' + first_name + '\nВаш id: ' + chatId + '\nВаш баланс: ' + balance +' грн \n\nТех.поддержка: @firstobmen_support';
-  // отправляем сообщение
-    
 bot.sendMessage(chatId, txt,{
     reply_markup:{
         inline_keyboard: keyboard1
     }
-});
    }); 
+ }); 
+
+
+});
+
+
+  // отправляем сообщение
+    
 
 
      getCrypto();
@@ -328,17 +338,22 @@ bot.on('callback_query', (query) =>  {
     status = 0;
     const chatId = query.message.chat.id;
     
+    const objTg_id = Object.assign({"tg_id": chatId});
     
     if (query.data === 'back') {
+    User.findOne({where: objTg_id}).then(id => {
     
-    let txt = '👋 Здравствуй, ' + f_name + '\n\nВаш id: ' + chatId + '\n\nВаш баланс: ' + balance +' грн \n\nТех.поддержка: @firstobmen_support';
+    	let txt = '👋 Здравствуй, ' + f_name + '\n\nВаш id: ' + chatId + '\n\nВаш баланс: ' + id.balance +' грн \n\nТех.поддержка: @firstobmen_support';		
+
   // отправляем сообщение
     
-bot.sendMessage(chatId, txt,{
-    reply_markup:{
-        inline_keyboard: keyboard1
-    }
-});
+	bot.sendMessage(chatId, txt,{
+    		reply_markup:{
+        		inline_keyboard: keyboard1
+    		}
+	});
+}); 
+
 }
     if (query.data === 'obmen') { // если кот
         let date_ob = new Date();
@@ -406,7 +421,7 @@ console.log(_coinList.LTC*usduah);
         });
     }
     if (query.data === 'xmr'){ // если кот
-    
+
     let txt = 'Ваш адресс XMR (Monero): 8AYfAEkFwKdeHL6Fm5Dv5FHMVcFEomEeNAd5sdkzPfg81SZMrQ8MCRPfumXBbpue3A95swpWkqgGZQAQh5WRxiiA1jBBApm\n\nПлатеж будет обработан и зачислен автоматически\nТех.поддержка: @firstobmen_support';
 
         //\nCсылка на обменник: https://d-obmen.cc
@@ -420,14 +435,20 @@ console.log(_coinList.LTC*usduah);
     }
     
     if (query.data === 'vyvod'){ // если кот
-    
-    let txt = 'Для оформления заявки на вывод необходимо указать сумму и номер карты. Вывод осуществляется в валюте - UAH на любую карту в автоматическом режиме\n Доступно средств: ' + balance + ' грн\n Для вывода отправьте сумму в ответ на это сообщение в указаной валюте:';
+
+    const objTg_id = Object.assign({"tg_id": chatId});
+
+        User.findOne({where: objTg_id}).then(id => {
+
+    let txt = 'Для оформления заявки на вывод необходимо указать сумму и номер карты. Вывод осуществляется в валюте - UAH на любую карту в автоматическом режиме\n Доступно средств: ' + id.balance + ' грн\n Для вывода отправьте сумму в ответ на это сообщение в указаной валюте:';
+
+
     //let txt1 = 'Я сейчас могу проанализировать самые выгодные компании именно для тебя ';
 
         //bot.sendMessage(chatId, txt);
         status = 1;
          bot.sendMessage(chatId, txt);
-        
+});        
                }
 
     if (query.data === 'card'){
